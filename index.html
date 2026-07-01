@@ -1370,36 +1370,25 @@ Castastics is a world of large casts of unique characters and make all dreams co
     </div>
     <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. Find all your video containers/iframes on the page
-    const videos = document.querySelectorAll('.video-gate-container, iframe');
+    // 1. Find all your movie and show cards
+    const cards = document.querySelectorAll('.card');
 
-    videos.forEach(video => {
-        // Create an invisible shield over the video
-        const shield = document.createElement('div');
-        Object.assign(shield.style, {
-            position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', zIndex: '9999'
-        });
-
-        // Wrap the video so the shield sits perfectly on top of it
-        video.style.position = 'relative';
-        video.parentNode.insertBefore(shield, video);
-        shield.appendChild(video);
-
-        // 2. When they click the video...
-        shield.addEventListener('click', function(e) {
-            // If they aren't subbed, block the play button and scroll them up!
+    cards.forEach(card => {
+        // 2. Intercept the click before 'onclick' fires
+        card.addEventListener('click', function(e) {
+            // 3. If they aren't subbed, stop the movie player and scroll up!
             if (localStorage.getItem("isSubscribed") !== "true") {
                 e.preventDefault();
-                alert("🔒 Subscribe to the free newsletter above to watch!");
-                
+                e.stopImmediatePropagation(); // 🔥 Blocks the onclick script from running
+
+                alert("🔒 Subscribe to the free newsletter above to unlock and watch!");
+
                 const box = document.getElementById('subscriber-perks-box');
                 if (box) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else {
-                // If they ARE subbed, let them click right through to watch
-                shield.style.pointerEvents = 'none';
             }
-        });
+        }, true); // The 'true' here makes sure this check happens FIRST
     });
-                          </script>
+});
+                                            </script>
 </body>
 </html>
