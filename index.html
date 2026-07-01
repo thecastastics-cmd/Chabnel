@@ -1370,15 +1370,19 @@ Castastics is a world of large casts of unique characters and make all dreams co
     </div>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const cards = document.querySelectorAll('.card');
+    // Targets the movie/show cards AND any dropdown selectors on the page
+    const elementsToLock = document.querySelectorAll('.card, select, option');
 
-    cards.forEach(card => {
-        card.addEventListener('click', function(e) {
+    elementsToLock.forEach(element => {
+        // Intercept the click or change action
+        const eventType = element.tagName === 'SELECT' ? 'change' : 'click';
+        
+        element.addEventListener(eventType, function(e) {
             if (localStorage.getItem("isSubscribed") !== "true") {
                 e.preventDefault();
-                e.stopImmediatePropagation(); // Blocks the movie from opening
+                e.stopImmediatePropagation(); // Blocks the episode from loading or playing
 
-                // 🔔 CALLS YOUR SMOOTH CUSTOM TOAST LOGIC!
+                // Trigger your custom toast notification
                 const toast = document.getElementById("custom-toast");
                 if (toast) {
                     toast.innerText = "🔒 Please subscribe to the channel above to unlock and watch!";
@@ -1393,8 +1397,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (subButton) {
                     subButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
+                
+                // If it's a dropdown, reset it so it doesn't stay selected
+                if (element.tagName === 'SELECT') {
+                    element.selectedIndex = 0;
+                }
             }
-        }, true); 
+        }, true); // Forces this check to happen first
     });
 });
 </script>
