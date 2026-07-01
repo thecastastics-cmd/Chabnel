@@ -1368,30 +1368,35 @@ Castastics is a world of large casts of unique characters and make all dreams co
     <div id="custom-toast" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #ffcc00; color: #000; padding: 12px 24px; border-radius: 25px; font-family: sans-serif; font-weight: bold; font-size: 0.95rem; box-shadow: 0px 4px 15px rgba(0,0,0,0.5); z-index: 99999; text-align: center; min-width: 250px;">
     Thank you for commenting!
     </div>
- <script>
+<script>
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. Find all your movie and show cards
     const cards = document.querySelectorAll('.card');
 
     cards.forEach(card => {
-        // 2. Intercept the click before your onclick movie player fires
         card.addEventListener('click', function(e) {
-            // 3. If they haven't clicked your main sub button, lock them out!
             if (localStorage.getItem("isSubscribed") !== "true") {
                 e.preventDefault();
                 e.stopImmediatePropagation(); // Blocks the movie from opening
 
-                alert("🔒 Please subscribe to the channel above to unlock and watch!");
+                // 🔔 CALLS YOUR SMOOTH CUSTOM TOAST LOGIC!
+                const toast = document.getElementById("custom-toast");
+                if (toast) {
+                    toast.innerText = "🔒 Please subscribe to the channel above to unlock and watch!";
+                    toast.style.display = "block";
+                    setTimeout(() => {
+                        toast.style.display = "none";
+                    }, 3000);
+                }
 
-                // Smoothly scroll them right up to your main sub button
+                // Smoothly scroll up to your main sub button
                 const subButton = document.getElementById('sub-button');
                 if (subButton) {
                     subButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }
-        }, true); // Forces this check to happen first
+        }, true); 
     });
 });
- </script>
+</script>
 </body>
 </html>
