@@ -1407,19 +1407,27 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 </script>
-    <script>
-// KILL DOWNLOAD BUTTON + RIGHT CLICK ON ALL VIDEOS AND IMAGES
+<script>
+// NUKE DOWNLOAD BUTTON + RIGHT CLICK ON ALL VIDEOS AND IMAGES
 document.addEventListener('DOMContentLoaded', function() {
-  // 1. Kill download button on every video
-  document.querySelectorAll('video').forEach(video => {
-    video.setAttribute('controlsList', 'nodownload');
-    video.setAttribute('oncontextmenu', 'return false');
-  });
+  function lockDownMedia() {
+    // 1. Kill download button on every video
+    document.querySelectorAll('video').forEach(video => {
+      video.controlsList = "nodownload"; // use property not attribute
+      video.disablePictureInPicture = true;
+      video.addEventListener('contextmenu', e => e.preventDefault());
+    });
+    
+    // 2. Kill right-click on every video and image
+    document.querySelectorAll('video, img').forEach(el => {
+      el.addEventListener('contextmenu', e => e.preventDefault());
+      el.setAttribute('draggable', 'false'); // stops drag-to-desktop
+    });
+  }
   
-  // 2. Kill right-click on every video and image
-  document.querySelectorAll('video, img').forEach(el => {
-    el.addEventListener('contextmenu', e => e.preventDefault());
-  });
+  lockDownMedia();
+  // Run again after 2 seconds in case videos load late from Dropbox
+  setTimeout(lockDownMedia, 2000);
 });
 </script>
 </body>
