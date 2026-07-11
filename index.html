@@ -670,7 +670,7 @@ Castastics is a world of large casts of unique characters and make all dreams co
     <div class="card" onclick="playMedia('https://www.dropbox.com/scl/fi/hymc8ynygh76oev3vlq5s/The-Idiotastics-Movie-A-Castastics-Story.mp4?rlkey=ukb8jjdm9nwjtu69klm5zwe2h&st=x8erf7ek&raw=1', 'The Idiotastics Movie (A Castastics Story)'); registerVideoView(); loadMediaInteraction('movie7');">
         <img src="posters/movie7.jpg">
         <p class="movie-title">The Idiotastics Movie</p>
-        <p class="movie-desc">Brian, David's autistic and not so smart music lover, completed his dreams of being a musician and even meeting lady gaga, his idol.</p>
+        <p class="movie-desc">Brian, David's autistic and not so smart music loving brother, completed his dreams of being a musician and even meeting lady gaga, his idol.</p>
     </div>
     </div>
 
@@ -1405,6 +1405,21 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }, true); // Forces this check to happen first
     });
+});
+</script>
+    <script>
+// KILL DOWNLOAD BUTTON + RIGHT CLICK ON ALL VIDEOS AND IMAGES
+document.addEventListener('DOMContentLoaded', function() {
+  // 1. Kill download button on every video
+  document.querySelectorAll('video').forEach(video => {
+    video.setAttribute('controlsList', 'nodownload');
+    video.setAttribute('oncontextmenu', 'return false');
+  });
+  
+  // 2. Kill right-click on every video and image
+  document.querySelectorAll('video, img').forEach(el => {
+    el.addEventListener('contextmenu', e => e.preventDefault());
+  });
 });
 </script>
 </body>
