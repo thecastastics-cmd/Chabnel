@@ -490,14 +490,10 @@
     flex-grow: 1 !important;
     margin-bottom: 12px !important;
 }
-        /* --- FULL WEBSITE BLUE BACKGROUND OVERRIDE --- */
+/* --- GRADIENT BRANDING FIX --- */
 body {
-    background: #001a33 !important; /* Force the main page blue */
-}
-
-/* This targets any section container that might be holding a black background */
-div[class*="container"], div[id*="header"], div[class*="banner"], .trailers-section {
-    background: transparent !important;
+    background: linear-gradient(to bottom, #000000 0%, #000000 15%, #001a33 40%, #001a33 100%) !important;
+    background-attachment: fixed !important;
 }
     </style>
 </head>
