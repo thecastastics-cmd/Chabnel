@@ -490,6 +490,15 @@
     flex-grow: 1 !important;
     margin-bottom: 12px !important;
 }
+        /* --- FULL WEBSITE BLUE BACKGROUND OVERRIDE --- */
+body {
+    background: #001a33 !important; /* Force the main page blue */
+}
+
+/* This targets any section container that might be holding a black background */
+div[class*="container"], div[id*="header"], div[class*="banner"], .trailers-section {
+    background: transparent !important;
+}
     </style>
 </head>
 <body>
