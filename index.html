@@ -490,10 +490,19 @@
     flex-grow: 1 !important;
     margin-bottom: 12px !important;
 }
-/* --- GRADIENT BRANDING FIX --- */
-body {
-    background: linear-gradient(to bottom, #000000 0%, #000000 15%, #001a33 40%, #001a33 100%) !important;
-    background-attachment: fixed !important;
+/* --- FORCE FRONT CONTAINERS BLUE --- */
+.trailers-section, 
+#video-display, 
+div[class*="container"], 
+div[class*="box"], 
+main {
+    background-color: #001a33 !important; /* Rich deep blue */
+    border: 1px solid #ffcc00 !important; /* Keeps your clean yellow borders */
+}
+
+/* Keeps your movie and show grids looking clean over the blue */
+.card {
+    background-color: #0a0a0a !important; /* Keeps cards slightly darker so they pop */
 }
     </style>
 </head>
