@@ -882,8 +882,9 @@ Castastics is a world of large casts of unique characters and make all dreams co
             display.style.display = "block";
             text.innerText = "NOW PLAYING: " + title;
 
+            // Added controlsList="nodownload" right after the controls attribute below!
             container.innerHTML = `
-                <video id="main-player" controls playsinline webkitallowfullscreen mozallowfullscreen allowfullscreen autoplay>
+                <video id="main-player" controls controlsList="nodownload" playsinline webkitallowfullscreen mozallowfullscreen allowfullscreen autoplay>
                     <source src="${link}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>`;
