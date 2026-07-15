@@ -872,7 +872,7 @@ Castastics is a world of large casts of unique characters and make all dreams co
         </div>
     </div>
 
-    <script>
+<script>
         function playMedia(link, title) {
             if (!link || link.includes('DRIVE_ID')) return;
             const display = document.getElementById('video-display');
@@ -881,17 +881,15 @@ Castastics is a world of large casts of unique characters and make all dreams co
 
             display.style.display = "block";
             text.innerText = "NOW PLAYING: " + title;
-
-            // Added controlsList="nodownload" right after the controls attribute below!
             container.innerHTML = `
-                <video id="main-player" controls controlsList="nodownload" playsinline webkitallowfullscreen mozallowfullscreen allowfullscreen autoplay>
+                <video id="main-player" controls controlsList="nodownload" oncontextmenu="return false;" style="-webkit-touch-callout: none;" playsinline webkitallowfullscreen mozallowfullscreen allowfullscreen autoplay>
                     <source src="${link}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>`;
 
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
-    </script>
+</script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
