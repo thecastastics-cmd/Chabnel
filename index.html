@@ -1545,6 +1545,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const eventType = element.tagName === 'SELECT' ? 'change' : 'click';
         
         element.addEventListener(eventType, function(e) {
+            if (e.target.classList.contains('btn-trailer')) return;
             if (localStorage.getItem("isSubscribed") !== "true") {
                 e.preventDefault();
                 e.stopImmediatePropagation(); // Blocks the episode from loading or playing
