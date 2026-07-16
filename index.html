@@ -965,6 +965,8 @@ Castastics is a world of large casts of unique characters and make all dreams co
         </div>
     </div>
 
+
+        
 <script>
         function playMedia(link, title) {
             if (!link || link.includes('DRIVE_ID')) return;
@@ -982,89 +984,102 @@ Castastics is a world of large casts of unique characters and make all dreams co
                 </video>`;
 
             window.scrollTo({top: 0, behavior: 'smooth'});
-            if (title === "The Castastics Movie") { 
+
+            // 1. Map your movie titles to their subtitle files
+            const movieSubtitles = {
+                "The Castastics Movie": "mov1.txt",
+                "The Castastics 3: Brookhaven": "mov3.txt",
+                "The Castastics 5: Castastic Heroes": "mov4.txt",
+                "The Super Toys": "mov6.txt"
+            };
+
+            // 2. See if the clicked movie has subtitles in our list
+            const subFile = movieSubtitles[title];
+
+            if (subFile) { 
                 document.getElementById('main-player').ontimeupdate = updateSubtitles; 
                 container.style.position = "relative"; 
                 container.insertAdjacentHTML('beforeend', '<div id="subtitle-overlay" style="position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #fff; font-family: sans-serif; font-size: 1.1rem; font-weight: bold; padding: 6px 14px; border-radius: 5px; text-align: center; pointer-events: none; display: none; width: 80%; text-shadow: 1px 1px 2px #000; z-index: 99;"></div><button id="cc-btn" onclick="toggleSubtitles()" style="margin-top: 10px; padding: 8px 16px; background: #333; color: #fff; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">CC: OFF</button>'); 
-                loadSRTSubtitles('mov1.txt'); 
+                loadSRTSubtitles(subFile); 
             } else {
                 subsActive = false;
                 currentSubtitles = [];
             }
-    }
+        } // Closes playMedia
+
     // --- NEW SUBTITLE ENGINE (SAFE TO PASTE BELOW YOUR FUNCTION) ---
-let currentSubtitles = [];
-let subsActive = false; // Default is OFF
+    let currentSubtitles = [];
+    let subsActive = false; // Default is OFF
 
-function parseSRTTime(timeString) {
-    const parts = timeString.split(':');
-    const secondsParts = parts[2].split(',');
-    const hours = parseInt(parts[0], 10);
-    const minutes = parseInt(parts[1], 10);
-    const seconds = parseInt(secondsParts[0], 10);
-    const milliseconds = parseInt(secondsParts[1], 10);
-    return (hours * 3600) + (minutes * 60) + seconds + (milliseconds / 1000);
-}
-
-function loadSRTSubtitles(srtUrl) {
-    if (!srtUrl) {
-        currentSubtitles = [];
-        const overlay = document.getElementById('subtitle-overlay');
-        if (overlay) overlay.style.display = 'none';
-        return;
+    function parseSRTTime(timeString) {
+        const parts = timeString.split(':');
+        const secondsParts = parts[2].split(',');
+        const hours = parseInt(parts[0], 10);
+        const minutes = parseInt(parts[1], 10);
+        const seconds = parseInt(secondsParts[0], 10);
+        const milliseconds = parseInt(secondsParts[1], 10);
+        return (hours * 3600) + (minutes * 60) + seconds + (milliseconds / 1000);
     }
-    fetch(srtUrl)
-        .then(response => response.text())
-        .then(data => {
+
+    function loadSRTSubtitles(srtUrl) {
+        if (!srtUrl) {
             currentSubtitles = [];
-            const blocks = data.replace(/\r/g, '').split('\n\n');
-            blocks.forEach(block => {
-                const lines = block.split('\n');
-                if (lines.length >= 3) {
-                    const times = lines[1].split(' --> ');
-                    if (times.length === 2) {
-                        const start = parseSRTTime(times[0]);
-                        const end = parseSRTTime(times[1]);
-                        const text = lines.slice(2).join('<br>');
-                        currentSubtitles.push({ start, end, text });
+            const overlay = document.getElementById('subtitle-overlay');
+            if (overlay) overlay.style.display = 'none';
+            return;
+        }
+        fetch(srtUrl)
+            .then(response => response.text())
+            .then(data => {
+                currentSubtitles = [];
+                const blocks = data.replace(/\r/g, '').split('\n\n');
+                blocks.forEach(block => {
+                    const lines = block.split('\n');
+                    if (lines.length >= 3) {
+                        const times = lines[1].split(' --> ');
+                        if (times.length === 2) {
+                            const start = parseSRTTime(times[0]);
+                            const end = parseSRTTime(times[1]);
+                            const text = lines.slice(2).join('<br>');
+                            currentSubtitles.push({ start, end, text });
+                        }
                     }
-                }
-            });
-        })
-        .catch(err => console.error("Subtitles failed to load:", err));
-}
-
-function updateSubtitles() {
-    const video = document.getElementById('main-player');
-    const overlay = document.getElementById('subtitle-overlay');
-    if (!video || !overlay || currentSubtitles.length === 0 || !subsActive) {
-        if (overlay) overlay.style.display = 'none';
-        return;
+                });
+            })
+            .catch(err => console.error("Subtitles failed to load:", err));
     }
-    const currentTime = video.currentTime;
-    const activeSub = currentSubtitles.find(sub => currentTime >= sub.start && currentTime <= sub.end);
-    if (activeSub) {
-        overlay.innerHTML = activeSub.text;
-        overlay.style.display = 'block';
-    } else {
-        overlay.style.display = 'none';
-    }
-}
 
-function toggleSubtitles() {
-    const btn = document.getElementById('cc-btn');
-    subsActive = !subsActive;
-    if (subsActive) {
-        btn.innerText = "CC: ON";
-        btn.style.background = "#ffcc00";
-        btn.style.color = "#000";
-    } else {
-        btn.innerText = "CC: OFF";
-        btn.style.background = "#333";
-        btn.style.color = "#fff";
+    function updateSubtitles() {
+        const video = document.getElementById('main-player');
         const overlay = document.getElementById('subtitle-overlay');
-        if (overlay) overlay.style.display = 'none';
-      }
+        if (!video || !overlay || currentSubtitles.length === 0 || !subsActive) {
+            if (overlay) overlay.style.display = 'none';
+            return;
+        }
+        const currentTime = video.currentTime;
+        const activeSub = currentSubtitles.find(sub => currentTime >= sub.start && currentTime <= sub.end);
+        if (activeSub) {
+            overlay.innerHTML = activeSub.text;
+            overlay.style.display = 'block';
+        } else {
+            overlay.style.display = 'none';
+        }
+    }
+
+    function toggleSubtitles() {
+        const btn = document.getElementById('cc-btn');
+        subsActive = !subsActive;
+        if (subsActive) {
+            btn.innerText = "CC: ON";
+            btn.style.background = "#ffcc00";
+            btn.style.color = "#000";
+        } else {
+            btn.innerText = "CC: OFF";
+            btn.style.background = "#333";
+            btn.style.color = "#fff";
+            const overlay = document.getElementById('subtitle-overlay');
+            if (overlay) overlay.style.display = 'none';
+        }
     }
 </script>
 
