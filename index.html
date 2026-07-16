@@ -499,6 +499,54 @@ main {
     background-color: #0033aa !important; /* Electric Blue */
     border: 1px solid #ffcc00 !important; 
 }
+/* Streaming Metadata Row */
+.movie-metadata {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+}
+
+/* Styled Rating Badge */
+.badge-rating {
+    background-color: #111;
+    color: #ffcc00;
+    border: 1px solid #ffcc00;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Runtime style */
+.movie-runtime {
+    color: #bbb;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Genre Tags style */
+.movie-genre {
+    color: #777;
+    font-size: 11px;
+}
+
+/* Credits Block style */
+.movie-credits {
+    margin-top: 10px;
+    border-top: 1px solid #222;
+    padding-top: 8px;
+    font-size: 11px;
+    color: #aaa;
+    line-height: 1.4;
+    text-align: left;
+}
+
+.movie-credits strong {
+    color: #ffcc00;
+}        
     </style>
 </head>
 <body>
@@ -669,8 +717,18 @@ Castastics is a world of large casts of unique characters and make all dreams co
     <!-- MOVIE 1 -->
     <div class="card" onclick="playMedia('https://www.dropbox.com/scl/fi/asw36zly5e8gtoaiqtw8s/The-Castastics-Movie.mp4?rlkey=nqqr5pzt0u41pp4flh3e35u2l&st=e5w5jr2p&raw=1', 'The Castastics Movie'); registerVideoView(); loadMediaInteraction('movie1');">
         <img src="posters/movie1.jpg">
-        <p class="movie-title">The Castastics Movie</p>
-        <p class="movie-desc">David, a 16 yr old boy who dreams of becoming an artist ever since, created books based upon his childhood and with the help of his magical castastian friends lives in his house. His goal is to get his artwork known.</p><div class="watch-btn">▶ Watch Now</div>
+        <p class="movie-title">The Castastics Movie</p><div class="movie-metadata">
+    <span class="badge-rating">PG-13</span>
+    <span class="movie-runtime">⏱️ 48 mins</span>
+    <span class="movie-runtime">⏱️ Dec 20, 2023</span>
+    <span class="movie-genre">Fantasy • Adventure</span>
+</
+div> <p class="movie-desc">David, a 16 yr old boy who dreams of becoming an artist ever since, created books based upon his childhood and with the help of his magical castastian friends lives in his house. His goal is to get his artwork known.</p>
+<div class="movie-credits">
+    <strong>Starring:</strong> David Artsy, Zaria Lavender, Kayla Anderson<br>
+    <strong>Created By:</strong> David Artsy
+<strong>Directed By:</strong> Steven M. Hayes
+</div> <div class="watch-btn">▶ Watch Now</div>
     </div>
     
     <!-- MOVIE 2 -->
