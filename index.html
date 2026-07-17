@@ -611,6 +611,12 @@ body.pitch-black-mode .container {
     </style>
 </head>
 <body>
+    <div id="welcome-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000000; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+    <h1 style="color: #ffcc00; font-family: sans-serif; margin-bottom: 20px;">Welcome to the Castastic Channel</h1>
+    <button id="enter-btn" style="padding: 15px 30px; font-size: 1.2rem; background: #ffcc00; color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">ENTER SITE</button>
+</div>
+
+<audio id="welcome-recording" src="recording.mp3" preload="auto"></audio>
     <img src="ripped_top_right.png" alt="" style="position: fixed; top: -15px; right: -15px; width: 100px; height: auto; z-index: 9999; pointer-events: none; opacity: 0.95;">
     <img src="ripped_bottom_left.png" alt="" style="position: fixed; bottom: -15px; left: -15px; width: 100px; height: auto; z-index: 9999; pointer-events: none; opacity: 0.95;">
     <img src="ripped_bottom_right.png" alt="" style="position: fixed; bottom: -15px; right: -15px; width: 100px; height: auto; z-index: 9999; pointer-events: none; opacity: 0.95;">
@@ -1968,30 +1974,19 @@ document.addEventListener('DOMContentLoaded', function() {
             moonIcon.style.display = 'block';
         }
     });
-   </script> <script> 
-    // --- WELCOME RECORDING AUTOPLAY ---
-const welcomeAudio = document.getElementById('welcome-recording');
+   </script> <script>
+    const overlay = document.getElementById('welcome-overlay');
+    const enterBtn = document.getElementById('enter-btn');
+    const welcomeAudio = document.getElementById('welcome-recording');
 
-function playWelcomeRecording() {
-    welcomeAudio.play()
-        .then(() => {
-            // Successfully playing! Remove listeners so it doesn't trigger again
-            document.removeEventListener('click', playWelcomeRecording);
-            document.removeEventListener('touchstart', playWelcomeRecording);
-        })
-        .catch(error => {
-            console.log("Autoplay prevented by browser. Waiting for user interaction.");
-        });
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-    playWelcomeRecording();
-    
-    // Fallback: Play on first touch or click
-    document.addEventListener('click', playWelcomeRecording);
-    document.addEventListener('touchstart', playWelcomeRecording);
-});
-</script>
+    enterBtn.addEventListener('click', () => {
+        // 1. Hide the overlay
+        overlay.style.display = 'none';
+        
+        // 2. Play the audio
+        welcomeAudio.play().catch(e => console.log("Audio play failed"));
+    });
+   </script>
 
 </body>
 </html>
