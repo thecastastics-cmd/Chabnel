@@ -567,20 +567,23 @@ main {
 /* --- THEME TOGGLE STYLES --- */
 
 /* Default Classic Blue (Your current look) */
-body {
-    background-color: #003cd2; /* This matches your current screen blue */
-    transition: background-color 0.4s ease;
+body, .app-page {
+    background-color: #003cd2; /* Matches your classic blue */
+    transition: background-color 0.4s ease, background 0.4s ease;
 }
 
-/* Pitch Black Mode */
-body.pitch-black-mode {
+/* Pitch Black Mode: Forces the body and all page containers to go completely black */
+body.pitch-black-mode,
+body.pitch-black-mode .app-page,
+body.pitch-black-mode .container {
     background-color: #000000 !important;
+    background: #000000 !important;
 }
 
 /* Floating Toggle Button */
 .theme-toggle-btn {
     position: fixed;
-    bottom: 85px; /* Sits cleanly right above your mobile browser nav bar */
+    bottom: 85px; /* Sits cleanly above mobile browser nav bar */
     right: 20px;
     width: 50px;
     height: 50px;
@@ -592,7 +595,7 @@ body.pitch-black-mode {
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
-    z-index: 9999; /* Keeps it on top of everything */
+    z-index: 9999;
     transition: transform 0.2s ease, border-color 0.3s;
 }
 
@@ -604,7 +607,7 @@ body.pitch-black-mode {
     width: 24px;
     height: 24px;
     transition: fill 0.3s ease;
-}        
+}
     </style>
 </head>
 <body>
