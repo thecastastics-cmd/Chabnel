@@ -1933,6 +1933,7 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(lockDownMedia, 2000);
 });
 </script>
+    <audio id="welcome-recording" style="display: none;" src="recording.mp3" preload="auto"></audio>
 <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme">
     <svg id="moon-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="fill: #ffcc00;">
         <path d="M12.3 22c-5.52 0-10-4.48-10-10S6.78 2 12.3 2c.56 0 1.12.05 1.66.14.39.07.69.4.69.8 0 .54-.45.96-.98.88-4.52-.7-8.67 2.67-8.67 7.18 0 4.14 3.36 7.5 7.5 7.5 4.51 0 7.88-4.15 7.18-8.67-.08-.53.34-.98.88-.98.4 0 .73.3.8.69.09.54.14 1.1.14 1.66 0 5.52-4.48 10-10 10z"/>
@@ -1967,6 +1968,29 @@ document.addEventListener('DOMContentLoaded', function() {
             moonIcon.style.display = 'block';
         }
     });
+</script>
+    // --- WELCOME RECORDING AUTOPLAY ---
+const welcomeAudio = document.getElementById('welcome-recording');
+
+function playWelcomeRecording() {
+    welcomeAudio.play()
+        .then(() => {
+            // Successfully playing! Remove listeners so it doesn't trigger again
+            document.removeEventListener('click', playWelcomeRecording);
+            document.removeEventListener('touchstart', playWelcomeRecording);
+        })
+        .catch(error => {
+            console.log("Autoplay prevented by browser. Waiting for user interaction.");
+        });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    playWelcomeRecording();
+    
+    // Fallback: Play on first touch or click
+    document.addEventListener('click', playWelcomeRecording);
+    document.addEventListener('touchstart', playWelcomeRecording);
+});
 </script>
 
 </body>
