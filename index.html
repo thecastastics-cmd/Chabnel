@@ -1392,6 +1392,42 @@ cards.forEach(card => {
         });
     }
 });
+                    // --- LISTEN TO YOUR EXISTING FUNCTION ---
+const originalRegister = window.registerVideoView;
+
+window.registerVideoView = function() {
+    // 1. Run your original code first
+    originalRegister.apply(this, arguments);
+
+    // 2. Identify the movie by looking at the last item interacted with
+    // We get the ID from the function that your HTML button actually calls
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        // If the card is currently visible/active, increment it
+        // We check the onclick string to see if this card belongs to the current session
+        const onclick = card.getAttribute('onclick');
+        // This is a bit of a guess, so we rely on the fact that 
+        // you only click one at a time.
+    });
+    
+    // BETTER APPROACH: Use the same logic you use for the global counter
+    // to identify the specific movie.
+};
+
+// To make this work without touching your HTML, we need to know 
+// which movie was clicked. Since 'loadMediaInteraction' is also in 
+// your onclick, let's hijack that instead:
+
+if (typeof window.loadMediaInteraction === 'function') {
+    const originalLoad = window.loadMediaInteraction;
+    window.loadMediaInteraction = function(itemId) {
+        originalLoad(itemId); // Keeps your original logic
+        
+        // This automatically updates the specific movie count 
+        // every time you click, without you touching a single line of HTML!
+        runTransaction(ref(db, 'itemViews/' + itemId), (val) => (val || 0) + 1);
+    };
+}
                 </script>
 
 
