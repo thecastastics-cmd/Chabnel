@@ -1351,6 +1351,43 @@ Castastics is a world of large casts of unique characters and make all dreams co
 
         // Send the function to the global window scope so your HTML onclicks/onchanges can find it
         window.registerVideoView = registerVideoView;
+                    // --- ADD THIS BLOCK INSIDE YOUR EXISTING MODULE SCRIPT ---
+
+        // 1. Identify which items to track
+        const itemIds = ['castastics_show', 'idiotastics_show', 'totc_show', 'movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7'];
+
+        // 2. Loop through every card to inject the view display
+        document.querySelectorAll('.card').forEach(card => {
+            const select = card.querySelector('select');
+            const titleEl = card.querySelector('p'); // The Title
+            
+            if (select && titleEl) {
+                const onChange = select.getAttribute('onchange');
+                const id = itemIds.find(i => onChange.includes(i));
+                
+                if (id) {
+                    // Create the view display element
+                    const viewSpan = document.createElement('div');
+                    viewSpan.style.color = '#ffcc00';
+                    viewSpan.style.fontSize = '12px';
+                    viewSpan.style.marginTop = '5px';
+                    viewSpan.innerText = '0 views';
+                    
+                    // Insert it directly under the movie/show title
+                    titleEl.parentNode.insertBefore(viewSpan, titleEl.nextSibling);
+
+                    // Sync count from database
+                    onValue(ref(db, 'itemViews/' + id), (snapshot) => {
+                        viewSpan.innerText = (snapshot.val() || 0).toLocaleString() + " views";
+                    });
+
+                    // Add click listener to increment when a selection is made
+                    select.addEventListener('change', () => {
+                        runTransaction(ref(db, 'itemViews/' + id), (val) => (val || 0) + 1);
+                    });
+                }
+            }
+        });
                 </script>
 
 
@@ -1975,44 +2012,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 2. Play the audio
         welcomeAudio.play().catch(e => console.log("Audio play failed"));
     });
-// This function runs as soon as the page is ready
-window.addEventListener('load', () => {
-    const cards = document.querySelectorAll('.card');
-    const dbRefs = {}; // Store refs to avoid multiple listeners
 
-    cards.forEach(card => {
-        const select = card.querySelector('select');
-        const titleEl = card.querySelector('p');
-        
-        if (select && titleEl) {
-            const onChangeCode = select.getAttribute('onchange');
-            const ids = ['castastics_show', 'idiotastics_show', 'totc_show', 'movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7'];
-            const id = ids.find(i => onChangeCode.includes(i));
-            
-            if (id) {
-                // 1. Create the UI element
-                const viewSpan = document.createElement('span');
-                viewSpan.style.display = 'block';
-                viewSpan.style.color = '#ffcc00';
-                viewSpan.style.fontSize = '12px';
-                viewSpan.style.marginTop = '5px';
-                viewSpan.innerText = 'Loading...';
-                titleEl.parentNode.insertBefore(viewSpan, titleEl.nextSibling);
-
-                // 2. Setup live database listener
-                onValue(ref(db, 'itemViews/' + id), (snapshot) => {
-                    viewSpan.innerText = (snapshot.val() || 0).toLocaleString() + " views";
-                });
-
-                // 3. Attach the increment logic to the existing dropdown
-                select.addEventListener('change', () => {
-                    const itemRef = ref(db, 'itemViews/' + id);
-                    runTransaction(itemRef, (val) => (val || 0) + 1);
-                });
-            }
-        }
-    });
-});
 </script>
 
 </body>
