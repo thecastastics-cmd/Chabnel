@@ -1418,14 +1418,24 @@ window.registerVideoView = function() {
 // which movie was clicked. Since 'loadMediaInteraction' is also in 
 // your onclick, let's hijack that instead:
 
+// --- REPLACE ONLY THIS HIJACK BLOCK AT THE BOTTOM ---
+
 if (typeof window.loadMediaInteraction === 'function') {
     const originalLoad = window.loadMediaInteraction;
     window.loadMediaInteraction = function(itemId) {
-        originalLoad(itemId); // Keeps your original logic
+        // 1. Run your original code first to keep the site working
+        originalLoad.apply(this, arguments); 
         
-        // This automatically updates the specific movie count 
-        // every time you click, without you touching a single line of HTML!
-        runTransaction(ref(db, 'itemViews/' + itemId), (val) => (val || 0) + 1);
+        // 2. Safely increment the specific movie view count
+        // We use a safe check to ensure itemId is a valid string
+        if (itemId) {
+            const itemRef = ref(db, 'itemViews/' + itemId);
+            runTransaction(itemRef, (val) => {
+                return (val || 0) + 1;
+            }).catch((err) => {
+                console.error("Transaction failed:", err);
+            });
+        }
     };
 }
                 </script>
