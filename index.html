@@ -1351,32 +1351,42 @@ Castastics is a world of large casts of unique characters and make all dreams co
 
         // Send the function to the global window scope so your HTML onclicks/onchanges can find it
         window.registerVideoView = registerVideoView;
-                    // This targets the specific structure of your cards
+         // --- REPLACE YOUR PREVIOUS INJECTION CODE WITH THIS ---
+
+// Import the 'get' function so we can fetch data once
+import { get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
 const cards = document.querySelectorAll('.card');
 
 cards.forEach(card => {
-    // 1. Get the title element (the p tag with class="movie-title")
     const titleEl = card.querySelector('.movie-title');
-    
-    // 2. Extract the movie ID from the onclick attribute string
     const onclickAttr = card.getAttribute('onclick');
     const ids = ['movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7', 'totc_show', 'castastics_show', 'idiotastics_show'];
-    const id = ids.find(i => onclickAttr.includes(i));
+    const id = ids.find(i => onclickAttr && onclickAttr.includes(i));
 
     if (titleEl && id) {
-        // 3. Create the view count element
         const viewSpan = document.createElement('div');
         viewSpan.className = 'view-count-display';
         viewSpan.style.color = '#ffcc00';
         viewSpan.style.fontSize = '12px';
         viewSpan.style.fontWeight = 'bold';
         viewSpan.style.marginTop = '5px';
-        viewSpan.innerText = 'Loading...';
-        
-        // 4. Inject it right after the movie title
+        viewSpan.innerText = '0 views';
         titleEl.parentNode.insertBefore(viewSpan, titleEl.nextSibling);
 
-        // 5. Sync from Firebase
+        // Fetch data immediately
+        get(ref(db, 'itemViews/' + id)).then((snapshot) => {
+            if (snapshot.exists()) {
+                viewSpan.innerText = snapshot.val().toLocaleString() + " views";
+            } else {
+                viewSpan.innerText = "0 views";
+            }
+        }).catch((error) => {
+            console.error("Firebase Error:", error);
+            viewSpan.innerText = "Error";
+        });
+
+        // Keep it live
         onValue(ref(db, 'itemViews/' + id), (snapshot) => {
             viewSpan.innerText = (snapshot.val() || 0).toLocaleString() + " views";
         });
