@@ -1982,37 +1982,37 @@ if (typeof window.loadMediaInteraction === 'function') {
         originalLoad(itemId); 
         const itemRef = ref(db, 'itemViews/' + itemId);
         runTransaction(itemRef, (val) => (val || 0) + 1);
-        
-        // Show count immediately
-        showViewCountOnPlayer(itemId);
     };
 }
 
-function showViewCountOnPlayer(itemId) {
-    // We target the video-wrapper we know exists after playMedia runs
+// 2. Watch for the player to appear, then inject the view count
+const observer = new MutationObserver((mutations) => {
     const wrapper = document.getElementById('video-wrapper');
-    if (!wrapper) {
-        // If not ready, wait half a second and try again
-        setTimeout(() => showViewCountOnPlayer(itemId), 500);
-        return;
-    }
-
-    let viewSpan = document.getElementById('player-view-count');
-    if (!viewSpan) {
-        viewSpan = document.createElement('div');
+    if (wrapper && !document.getElementById('player-view-count')) {
+        const viewSpan = document.createElement('div');
         viewSpan.id = 'player-view-count';
         viewSpan.style.color = '#ffcc00';
         viewSpan.style.fontSize = '16px';
         viewSpan.style.padding = '10px';
         viewSpan.style.fontWeight = 'bold';
+        viewSpan.innerText = 'Loading views...';
         wrapper.appendChild(viewSpan);
-    }
 
-    // Fetch and show the count
-    get(ref(db, 'itemViews/' + itemId)).then((snapshot) => {
-        viewSpan.innerText = (snapshot.val() || 0).toLocaleString() + " views";
-    });
-}
+        // Figure out which item it is
+        const items = ['castastics_show', 'idiotastics_show', 'totc_show', 'movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7'];
+        // This grabs the ID from the URL or text in the page
+        const foundId = items.find(id => window.location.href.includes(id) || document.body.innerText.includes(id));
+        
+        if (foundId) {
+            get(ref(db, 'itemViews/' + foundId)).then((snapshot) => {
+                viewSpan.innerText = (snapshot.val() || 0).toLocaleString() + " views";
+            });
+        }
+    }
+});
+
+// Start watching the page
+observer.observe(document.body, { childList: true, subtree: true });
 </script>
 
 </body>
