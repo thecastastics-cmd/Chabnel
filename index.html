@@ -1975,34 +1975,44 @@ document.addEventListener('DOMContentLoaded', function() {
         // 2. Play the audio
         welcomeAudio.play().catch(e => console.log("Audio play failed"));
     });
-// 1. Diagnostics: Log to console so we know the script is actually running
-console.log("View-counter script loaded...");
+// This function runs as soon as the page is ready
+window.addEventListener('load', () => {
+    const cards = document.querySelectorAll('.card');
+    const dbRefs = {}; // Store refs to avoid multiple listeners
 
-// 2. The Hijack
-if (typeof window.loadMediaInteraction === 'function') {
-    const originalLoad = window.loadMediaInteraction;
-    window.loadMediaInteraction = function(itemId) {
-        console.log("Attempting to increment: " + itemId); // DEBUG
+    cards.forEach(card => {
+        const select = card.querySelector('select');
+        const titleEl = card.querySelector('p');
         
-        originalLoad(itemId); 
-        
-        // Ensure db is defined globally
-        if (typeof db === 'undefined') {
-            console.error("ERROR: 'db' variable is not defined! Check your Firebase init.");
-            return;
+        if (select && titleEl) {
+            const onChangeCode = select.getAttribute('onchange');
+            const ids = ['castastics_show', 'idiotastics_show', 'totc_show', 'movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7'];
+            const id = ids.find(i => onChangeCode.includes(i));
+            
+            if (id) {
+                // 1. Create the UI element
+                const viewSpan = document.createElement('span');
+                viewSpan.style.display = 'block';
+                viewSpan.style.color = '#ffcc00';
+                viewSpan.style.fontSize = '12px';
+                viewSpan.style.marginTop = '5px';
+                viewSpan.innerText = 'Loading...';
+                titleEl.parentNode.insertBefore(viewSpan, titleEl.nextSibling);
+
+                // 2. Setup live database listener
+                onValue(ref(db, 'itemViews/' + id), (snapshot) => {
+                    viewSpan.innerText = (snapshot.val() || 0).toLocaleString() + " views";
+                });
+
+                // 3. Attach the increment logic to the existing dropdown
+                select.addEventListener('change', () => {
+                    const itemRef = ref(db, 'itemViews/' + id);
+                    runTransaction(itemRef, (val) => (val || 0) + 1);
+                });
+            }
         }
-
-        const itemRef = ref(db, 'itemViews/' + itemId);
-        runTransaction(itemRef, (val) => {
-            console.log("Transaction running for: " + itemId); // DEBUG
-            return (val || 0) + 1;
-        }).then(() => {
-            console.log("Successfully incremented " + itemId);
-        }).catch((err) => {
-            console.error("Transaction failed:", err);
-        });
-    };
-}
+    });
+});
 </script>
 
 </body>
