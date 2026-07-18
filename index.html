@@ -1351,43 +1351,47 @@ Castastics is a world of large casts of unique characters and make all dreams co
 
         // Send the function to the global window scope so your HTML onclicks/onchanges can find it
         window.registerVideoView = registerVideoView;
-                    // --- ADD THIS BLOCK INSIDE YOUR EXISTING MODULE SCRIPT ---
+                    // --- ADD THIS INSIDE YOUR EXISTING <script type="module"> BLOCK ---
 
-        // 1. Identify which items to track
-        const itemIds = ['castastics_show', 'idiotastics_show', 'totc_show', 'movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7'];
+// 1. Define your show/movie IDs (must match your Firebase 'itemViews' keys)
+const mediaItems = {
+    'totc_show': 'Tales Of The Castastics',
+    'castastics_show': 'Castastics Show',
+    'idiotastics_show': 'Idiotastics Show',
+    'movie1': 'Movie 1', // Add your other IDs here
+    'movie2': 'Movie 2'
+};
 
-        // 2. Loop through every card to inject the view display
-        document.querySelectorAll('.card').forEach(card => {
-            const select = card.querySelector('select');
-            const titleEl = card.querySelector('p'); // The Title
-            
-            if (select && titleEl) {
-                const onChange = select.getAttribute('onchange');
-                const id = itemIds.find(i => onChange.includes(i));
-                
-                if (id) {
-                    // Create the view display element
-                    const viewSpan = document.createElement('div');
-                    viewSpan.style.color = '#ffcc00';
-                    viewSpan.style.fontSize = '12px';
-                    viewSpan.style.marginTop = '5px';
-                    viewSpan.innerText = '0 views';
-                    
-                    // Insert it directly under the movie/show title
-                    titleEl.parentNode.insertBefore(viewSpan, titleEl.nextSibling);
+// 2. Automatically inject and link to the database
+Object.keys(mediaItems).forEach(id => {
+    // Find the select menu that handles this ID
+    const select = document.querySelector(`select[onchange*="${id}"]`);
+    
+    if (select) {
+        const card = select.closest('.card'); // Assuming your poster structure
+        const titleEl = card ? card.querySelector('p') : null;
+        
+        if (titleEl) {
+            // Create the view counter
+            const viewDisplay = document.createElement('div');
+            viewDisplay.style.color = '#ffcc00';
+            viewDisplay.style.fontSize = '12px';
+            viewDisplay.style.fontWeight = 'bold';
+            viewDisplay.innerText = '0 views';
+            titleEl.parentNode.insertBefore(viewDisplay, titleEl.nextSibling);
 
-                    // Sync count from database
-                    onValue(ref(db, 'itemViews/' + id), (snapshot) => {
-                        viewSpan.innerText = (snapshot.val() || 0).toLocaleString() + " views";
-                    });
+            // Sync with Firebase
+            onValue(ref(db, 'itemViews/' + id), (snapshot) => {
+                viewDisplay.innerText = (snapshot.val() || 0).toLocaleString() + " views";
+            });
 
-                    // Add click listener to increment when a selection is made
-                    select.addEventListener('change', () => {
-                        runTransaction(ref(db, 'itemViews/' + id), (val) => (val || 0) + 1);
-                    });
-                }
-            }
-        });
+            // Update when played
+            select.addEventListener('change', () => {
+                runTransaction(ref(db, 'itemViews/' + id), (val) => (val || 0) + 1);
+            });
+        }
+    }
+});
                 </script>
 
 
