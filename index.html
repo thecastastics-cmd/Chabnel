@@ -1975,6 +1975,47 @@ document.addEventListener('DOMContentLoaded', function() {
         // 2. Play the audio
         welcomeAudio.play().catch(e => console.log("Audio play failed"));
     });
+       // 1. Hijack the existing loadMediaInteraction to update the specific view count
+const originalLoad = window.loadMediaInteraction;
+window.loadMediaInteraction = function(itemId) {
+    if (originalLoad) originalLoad(itemId);
+    
+    // Update the total AND the specific show/movie
+    registerVideoView(); 
+    const itemRef = ref(db, 'itemViews/' + itemId);
+    runTransaction(itemRef, (val) => (val || 0) + 1);
+};
+
+// 2. Automatically find the titles and inject the view count under them
+function autoInjectViews() {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        const titleEl = card.querySelector('p'); 
+        if (titleEl) {
+            const viewSpan = document.createElement('span');
+            viewSpan.style.display = 'block';
+            viewSpan.style.fontSize = '10px';
+            viewSpan.style.color = '#ffcc00'; 
+            viewSpan.innerText = '0 views';
+            titleEl.parentNode.insertBefore(viewSpan, titleEl.nextSibling);
+
+            const selectEl = card.querySelector('select');
+            if (selectEl) {
+                const onChangeCode = selectEl.getAttribute('onchange');
+                // Added 'castastics_show' here!
+                const itemId = ['castastics_show', 'idiotastics_show', 'totc_show', 'movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7']
+                              .find(id => onChangeCode && onChangeCode.includes(id));
+                
+                if (itemId) {
+                    onValue(ref(db, 'itemViews/' + itemId), (snapshot) => {
+                        viewSpan.innerText = (snapshot.val() || 0).toLocaleString() + " views";
+                    });
+                }
+            }
+        }
+    });
+}
+autoInjectViews();
    </script>
 
 </body>
