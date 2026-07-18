@@ -1975,44 +1975,34 @@ document.addEventListener('DOMContentLoaded', function() {
         // 2. Play the audio
         welcomeAudio.play().catch(e => console.log("Audio play failed"));
     });
-// 1. Hijack the global count and individual count
+// 1. Diagnostics: Log to console so we know the script is actually running
+console.log("View-counter script loaded...");
+
+// 2. The Hijack
 if (typeof window.loadMediaInteraction === 'function') {
     const originalLoad = window.loadMediaInteraction;
     window.loadMediaInteraction = function(itemId) {
+        console.log("Attempting to increment: " + itemId); // DEBUG
+        
         originalLoad(itemId); 
+        
+        // Ensure db is defined globally
+        if (typeof db === 'undefined') {
+            console.error("ERROR: 'db' variable is not defined! Check your Firebase init.");
+            return;
+        }
+
         const itemRef = ref(db, 'itemViews/' + itemId);
-        runTransaction(itemRef, (val) => (val || 0) + 1);
+        runTransaction(itemRef, (val) => {
+            console.log("Transaction running for: " + itemId); // DEBUG
+            return (val || 0) + 1;
+        }).then(() => {
+            console.log("Successfully incremented " + itemId);
+        }).catch((err) => {
+            console.error("Transaction failed:", err);
+        });
     };
 }
-
-// 2. Watch for the player to appear, then inject the view count
-const observer = new MutationObserver((mutations) => {
-    const wrapper = document.getElementById('video-wrapper');
-    if (wrapper && !document.getElementById('player-view-count')) {
-        const viewSpan = document.createElement('div');
-        viewSpan.id = 'player-view-count';
-        viewSpan.style.color = '#ffcc00';
-        viewSpan.style.fontSize = '16px';
-        viewSpan.style.padding = '10px';
-        viewSpan.style.fontWeight = 'bold';
-        viewSpan.innerText = 'Loading views...';
-        wrapper.appendChild(viewSpan);
-
-        // Figure out which item it is
-        const items = ['castastics_show', 'idiotastics_show', 'totc_show', 'movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7'];
-        // This grabs the ID from the URL or text in the page
-        const foundId = items.find(id => window.location.href.includes(id) || document.body.innerText.includes(id));
-        
-        if (foundId) {
-            get(ref(db, 'itemViews/' + foundId)).then((snapshot) => {
-                viewSpan.innerText = (snapshot.val() || 0).toLocaleString() + " views";
-            });
-        }
-    }
-});
-
-// Start watching the page
-observer.observe(document.body, { childList: true, subtree: true });
 </script>
 
 </body>
