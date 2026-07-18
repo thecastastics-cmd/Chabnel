@@ -1975,47 +1975,52 @@ document.addEventListener('DOMContentLoaded', function() {
         // 2. Play the audio
         welcomeAudio.play().catch(e => console.log("Audio play failed"));
     });
-       // 1. Hijack the existing loadMediaInteraction to update the specific view count
-const originalLoad = window.loadMediaInteraction;
-window.loadMediaInteraction = function(itemId) {
-    if (originalLoad) originalLoad(itemId);
-    
-    // Update the total AND the specific show/movie
-    registerVideoView(); 
-    const itemRef = ref(db, 'itemViews/' + itemId);
-    runTransaction(itemRef, (val) => (val || 0) + 1);
-};
+   window.addEventListener('load', () => {
+    // 1. Hijack the loadMediaInteraction to update the specific view count
+    if (typeof window.loadMediaInteraction === 'function') {
+        const originalLoad = window.loadMediaInteraction;
+        window.loadMediaInteraction = function(itemId) {
+            originalLoad(itemId); 
+            // Update the specific item in the 'itemViews' folder
+            const itemRef = ref(db, 'itemViews/' + itemId);
+            runTransaction(itemRef, (val) => (val || 0) + 1);
+        };
+    }
 
-// 2. Automatically find the titles and inject the view count under them
-function autoInjectViews() {
+    // 2. Automatically find and display the views
     const cards = document.querySelectorAll('.card');
-    cards.forEach(card => {
-        const titleEl = card.querySelector('p'); 
-        if (titleEl) {
-            const viewSpan = document.createElement('span');
-            viewSpan.style.display = 'block';
-            viewSpan.style.fontSize = '10px';
-            viewSpan.style.color = '#ffcc00'; 
-            viewSpan.innerText = '0 views';
-            titleEl.parentNode.insertBefore(viewSpan, titleEl.nextSibling);
+    const items = ['castastics_show', 'idiotastics_show', 'totc_show', 'movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7'];
 
-            const selectEl = card.querySelector('select');
-            if (selectEl) {
-                const onChangeCode = selectEl.getAttribute('onchange');
-                // Added 'castastics_show' here!
-                const itemId = ['castastics_show', 'idiotastics_show', 'totc_show', 'movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7']
-                              .find(id => onChangeCode && onChangeCode.includes(id));
-                
-                if (itemId) {
-                    onValue(ref(db, 'itemViews/' + itemId), (snapshot) => {
-                        viewSpan.innerText = (snapshot.val() || 0).toLocaleString() + " views";
-                    });
+    cards.forEach(card => {
+        const selectEl = card.querySelector('select');
+        const titleEl = card.querySelector('p');
+        
+        if (selectEl && titleEl) {
+            const onChangeCode = selectEl.getAttribute('onchange');
+            // Find which ID from our list exists in the onchange string
+            const itemId = items.find(id => onChangeCode.includes(id));
+            
+            if (itemId) {
+                // Add the display span if it doesn't exist yet
+                let viewSpan = card.querySelector('.view-count-display');
+                if (!viewSpan) {
+                    viewSpan = document.createElement('span');
+                    viewSpan.className = 'view-count-display';
+                    viewSpan.style.display = 'block';
+                    viewSpan.style.fontSize = '12px';
+                    viewSpan.style.color = '#ffcc00';
+                    viewSpan.innerText = 'Loading...';
+                    titleEl.parentNode.insertBefore(viewSpan, titleEl.nextSibling);
                 }
+
+                // Sync with Firebase 'itemViews' folder
+                onValue(ref(db, 'itemViews/' + itemId), (snapshot) => {
+                    viewSpan.innerText = (snapshot.val() || 0).toLocaleString() + " views";
+                });
             }
         }
     });
-}
-autoInjectViews();
+});
    </script>
 
 </body>
