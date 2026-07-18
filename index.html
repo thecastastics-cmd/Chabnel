@@ -1975,51 +1975,49 @@ document.addEventListener('DOMContentLoaded', function() {
         // 2. Play the audio
         welcomeAudio.play().catch(e => console.log("Audio play failed"));
     });
-   window.addEventListener('load', () => {
-    // 1. Hijack the loadMediaInteraction to update the specific view count
+<script>
+window.addEventListener('load', () => {
+    // 1. Hijack the global count and add individual count
     if (typeof window.loadMediaInteraction === 'function') {
         const originalLoad = window.loadMediaInteraction;
         window.loadMediaInteraction = function(itemId) {
             originalLoad(itemId); 
-            // Update the specific item in the 'itemViews' folder
+            // Increment in database
             const itemRef = ref(db, 'itemViews/' + itemId);
             runTransaction(itemRef, (val) => (val || 0) + 1);
         };
     }
 
-    // 2. Automatically find and display the views
-    const cards = document.querySelectorAll('.card');
-    const items = ['castastics_show', 'idiotastics_show', 'totc_show', 'movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7'];
+    // 2. Inject the view counter into the player area
+    // We look for the div that holds the "Now Playing" text
+    const nowPlayingDiv = document.getElementById('now-playing');
+    
+    if (nowPlayingDiv) {
+        const viewSpan = document.createElement('div');
+        viewSpan.id = 'player-view-count';
+        viewSpan.style.color = '#ffcc00';
+        viewSpan.style.fontSize = '14px';
+        viewSpan.style.marginTop = '5px';
+        viewSpan.innerText = '0 views';
+        nowPlayingDiv.appendChild(viewSpan);
 
-    cards.forEach(card => {
-        const selectEl = card.querySelector('select');
-        const titleEl = card.querySelector('p');
-        
-        if (selectEl && titleEl) {
-            const onChangeCode = selectEl.getAttribute('onchange');
-            // Find which ID from our list exists in the onchange string
-            const itemId = items.find(id => onChangeCode.includes(id));
-            
-            if (itemId) {
-                // Add the display span if it doesn't exist yet
-                let viewSpan = card.querySelector('.view-count-display');
-                if (!viewSpan) {
-                    viewSpan = document.createElement('span');
-                    viewSpan.className = 'view-count-display';
-                    viewSpan.style.display = 'block';
-                    viewSpan.style.fontSize = '12px';
-                    viewSpan.style.color = '#ffcc00';
-                    viewSpan.innerText = 'Loading...';
-                    titleEl.parentNode.insertBefore(viewSpan, titleEl.nextSibling);
+        // This listens for when a user changes the dropdown
+        // It detects the itemId from the select element on the page
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('change', (e) => {
+                const onChangeCode = e.target.getAttribute('onchange');
+                const items = ['castastics_show', 'idiotastics_show', 'totc_show', 'movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7'];
+                const itemId = items.find(id => onChangeCode.includes(id));
+                
+                if (itemId) {
+                    // Update the text in the player area whenever they pick a new video
+                    onValue(ref(db, 'itemViews/' + itemId), (snapshot) => {
+                        viewSpan.innerText = (snapshot.val() || 0).toLocaleString() + " views";
+                    });
                 }
-
-                // Sync with Firebase 'itemViews' folder
-                onValue(ref(db, 'itemViews/' + itemId), (snapshot) => {
-                    viewSpan.innerText = (snapshot.val() || 0).toLocaleString() + " views";
-                });
-            }
-        }
-    });
+            });
+        });
+    }
 });
    </script>
 
