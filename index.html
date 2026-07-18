@@ -1975,58 +1975,46 @@ document.addEventListener('DOMContentLoaded', function() {
         // 2. Play the audio
         welcomeAudio.play().catch(e => console.log("Audio play failed"));
     });
-// Define your list once globally
-const ITEM_IDS = ['castastics_show', 'idiotastics_show', 'totc_show', 'movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7'];
-
-// 1. Hijack the loadMediaInteraction
+<script>
+// 1. Hijack the global count and individual count
 if (typeof window.loadMediaInteraction === 'function') {
     const originalLoad = window.loadMediaInteraction;
     window.loadMediaInteraction = function(itemId) {
         originalLoad(itemId); 
-        // Increment in database
         const itemRef = ref(db, 'itemViews/' + itemId);
         runTransaction(itemRef, (val) => (val || 0) + 1);
         
-        // Trigger UI update when the interaction happens
-        updatePlayerViewCount(itemId);
+        // Show count immediately
+        showViewCountOnPlayer(itemId);
     };
 }
 
-// 2. Dedicated function to update the UI
-function updatePlayerViewCount(itemId) {
-    const nowPlayingDiv = document.getElementById('now-playing');
-    if (!nowPlayingDiv) return;
+function showViewCountOnPlayer(itemId) {
+    // We target the video-wrapper we know exists after playMedia runs
+    const wrapper = document.getElementById('video-wrapper');
+    if (!wrapper) {
+        // If not ready, wait half a second and try again
+        setTimeout(() => showViewCountOnPlayer(itemId), 500);
+        return;
+    }
 
     let viewSpan = document.getElementById('player-view-count');
     if (!viewSpan) {
         viewSpan = document.createElement('div');
         viewSpan.id = 'player-view-count';
         viewSpan.style.color = '#ffcc00';
-        viewSpan.style.fontSize = '14px';
-        viewSpan.style.marginTop = '5px';
-        nowPlayingDiv.appendChild(viewSpan);
+        viewSpan.style.fontSize = '16px';
+        viewSpan.style.padding = '10px';
+        viewSpan.style.fontWeight = 'bold';
+        wrapper.appendChild(viewSpan);
     }
 
-    // Use 'get' instead of 'onValue' to avoid creating endless listeners
-    // This fetches the current count once every time a video is played
+    // Fetch and show the count
     get(ref(db, 'itemViews/' + itemId)).then((snapshot) => {
         viewSpan.innerText = (snapshot.val() || 0).toLocaleString() + " views";
     });
 }
-
-// 3. Listen for dropdown changes
-window.addEventListener('load', () => {
-    document.querySelectorAll('select').forEach(select => {
-        select.addEventListener('change', (e) => {
-            const onChangeCode = e.target.getAttribute('onchange');
-            const foundId = ITEM_IDS.find(id => onChangeCode.includes(id));
-            if (foundId) {
-                updatePlayerViewCount(foundId);
-            }
-        });
-    });
-});
-   </script>
+</script>
 
 </body>
 </html>
