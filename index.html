@@ -1351,45 +1351,35 @@ Castastics is a world of large casts of unique characters and make all dreams co
 
         // Send the function to the global window scope so your HTML onclicks/onchanges can find it
         window.registerVideoView = registerVideoView;
-                    // --- ADD THIS INSIDE YOUR EXISTING <script type="module"> BLOCK ---
+                    // This targets the specific structure of your cards
+const cards = document.querySelectorAll('.card');
 
-// 1. Define your show/movie IDs (must match your Firebase 'itemViews' keys)
-const mediaItems = {
-    'totc_show': 'Tales Of The Castastics',
-    'castastics_show': 'Castastics Show',
-    'idiotastics_show': 'Idiotastics Show',
-    'movie1': 'Movie 1', // Add your other IDs here
-    'movie2': 'Movie 2'
-};
-
-// 2. Automatically inject and link to the database
-Object.keys(mediaItems).forEach(id => {
-    // Find the select menu that handles this ID
-    const select = document.querySelector(`select[onchange*="${id}"]`);
+cards.forEach(card => {
+    // 1. Get the title element (the p tag with class="movie-title")
+    const titleEl = card.querySelector('.movie-title');
     
-    if (select) {
-        const card = select.closest('.card'); // Assuming your poster structure
-        const titleEl = card ? card.querySelector('p') : null;
+    // 2. Extract the movie ID from the onclick attribute string
+    const onclickAttr = card.getAttribute('onclick');
+    const ids = ['movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7', 'totc_show', 'castastics_show', 'idiotastics_show'];
+    const id = ids.find(i => onclickAttr.includes(i));
+
+    if (titleEl && id) {
+        // 3. Create the view count element
+        const viewSpan = document.createElement('div');
+        viewSpan.className = 'view-count-display';
+        viewSpan.style.color = '#ffcc00';
+        viewSpan.style.fontSize = '12px';
+        viewSpan.style.fontWeight = 'bold';
+        viewSpan.style.marginTop = '5px';
+        viewSpan.innerText = 'Loading...';
         
-        if (titleEl) {
-            // Create the view counter
-            const viewDisplay = document.createElement('div');
-            viewDisplay.style.color = '#ffcc00';
-            viewDisplay.style.fontSize = '12px';
-            viewDisplay.style.fontWeight = 'bold';
-            viewDisplay.innerText = '0 views';
-            titleEl.parentNode.insertBefore(viewDisplay, titleEl.nextSibling);
+        // 4. Inject it right after the movie title
+        titleEl.parentNode.insertBefore(viewSpan, titleEl.nextSibling);
 
-            // Sync with Firebase
-            onValue(ref(db, 'itemViews/' + id), (snapshot) => {
-                viewDisplay.innerText = (snapshot.val() || 0).toLocaleString() + " views";
-            });
-
-            // Update when played
-            select.addEventListener('change', () => {
-                runTransaction(ref(db, 'itemViews/' + id), (val) => (val || 0) + 1);
-            });
-        }
+        // 5. Sync from Firebase
+        onValue(ref(db, 'itemViews/' + id), (snapshot) => {
+            viewSpan.innerText = (snapshot.val() || 0).toLocaleString() + " views";
+        });
     }
 });
                 </script>
