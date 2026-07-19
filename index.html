@@ -1481,7 +1481,7 @@ document.addEventListener('click', (e) => {
         .catch(err => console.error("Update failed:", err));
     }
 });
-// --- THE FINAL GLOBAL SHIELD ---
+// --- FINAL GATEKEEPER ---
 document.addEventListener('click', (e) => {
     const card = e.target.closest('.card');
     if (!card) return;
@@ -1495,23 +1495,18 @@ document.addEventListener('click', (e) => {
     if (foundId) {
         const sessionKey = 'viewed_' + foundId;
 
-        // If the movie has been viewed, we need to stop the View Count functions
+        // If this movie was already viewed in this session, 
+        // we stop the click event from ever reaching your other blocks.
         if (sessionStorage.getItem(sessionKey)) {
-            // This hijacks the functions your HTML calls
-            window.registerVideoView = function() {
-                console.log("Repeat view: Count blocked.");
-            };
-            
-            // Allow the rest of the click (the player) to continue
+            e.stopImmediatePropagation();
+            console.log("Repeat view blocked: Counter ignored.");
         } else {
-            // Mark as viewed
+            // First time viewing: set the flag and let the click pass through
             sessionStorage.setItem(sessionKey, 'true');
-            // Ensure the function is restored to its original state (if it was ever blocked)
-            // Note: Since we don't know the original function name for the itemViews 
-            // update, we rely on the fact that you aren't blocking the FIRST click.
+            console.log("New view: Proceeding to count.");
         }
     }
-}, true);
+}, true); // The 'true' is mandatory here to catch the click BEFORE your other blocks
         </script>
 
 
