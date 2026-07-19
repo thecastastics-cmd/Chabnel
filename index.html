@@ -633,6 +633,18 @@ body.pitch-black-mode .container {
     background: transparent;
     z-index: 10;
 }
+        .games-horizontal-container {
+    display: flex; /* This turns on horizontal alignment */
+    flex-wrap: wrap; /* Allows games to drop to a new line on small mobile screens */
+    gap: 20px; /* Space between the games */
+    justify-content: center; /* Centers them if they don't fill the whole row */
+}
+
+.game-card {
+    flex: 1; /* Makes them all the same width */
+    min-width: 250px; /* Ensures they don't get too squished on mobile */
+    max-width: 350px; /* Limits how wide they can grow */
+            }
     </style>
 </head>
 <body>
@@ -1728,28 +1740,32 @@ document.addEventListener('click', (e) => {
                         <p>Clothing, Stickers, Artworks, Bags etc</p>
                     </div>
                 </a>
-                <div class="game-card" id="game1-container">
-    <div class="game-thumbnail" onclick="loadGame('game1-container', 'https://microstudio.io/DavidArtz/dustin/')">
-        <img src="posters/dustin-game.jpg" alt="Dustin Game">
-        <div class="protect-overlay"></div>
-        <div class="play-button-overlay">▶</div>
+<div class="games-horizontal-container">
+    <div class="game-card" id="game1-container">
+        <div class="game-thumbnail" onclick="loadGame('game1-container', 'https://microstudio.io/DavidArtz/dustin/')">
+            <img src="posters/dustin-game.jpg" alt="Dustin Game">
+            <div class="protect-overlay"></div>
+            <div class="play-button-overlay">▶</div>
+        </div>
     </div>
-                </div>
-               <div class="game-card" id="game2-container">
-    <div class="game-thumbnail" onclick="loadGame('game2-container', 'https://microstudio.io/DavidArtz/marty/')">
-        <img src="posters/marty-game.jpg" alt="Marty Game">
-        <div class="protect-overlay"></div>
-        <div class="play-button-overlay">▶</div>
+
+    <div class="game-card" id="game2-container">
+        <div class="game-thumbnail" onclick="loadGame('game2-container', 'https://microstudio.io/DavidArtz/marty/')">
+            <img src="posters/marty-game.jpg" alt="Marty Game">
+            <div class="protect-overlay"></div>
+            <div class="play-button-overlay">▶</div>
+        </div>
+    </div>
+
+    <div class="game-card" id="game3-container">
+        <div class="game-thumbnail" onclick="loadGame('game3-container', 'https://microstudio.io/DavidArtz/pacman/')">
+            <img src="posters/pacman-game.jpg" alt="Pacman Game">
+            <div class="protect-overlay"></div>
+            <div class="play-button-overlay">▶</div>
+        </div>
     </div>
 </div>
-
-<div class="game-card" id="game3-container">
-    <div class="game-thumbnail" onclick="loadGame('game3-container', 'https://microstudio.io/DavidArtz/pacman/')">
-        <img src="posters/pacman-game.jpg" alt="Pacman Game">
-        <div class="protect-overlay"></div>
-        <div class="play-button-overlay">▶</div>
-    </div>
-
+    
 </div> 
             </div>
 
