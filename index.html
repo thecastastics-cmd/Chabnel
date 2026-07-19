@@ -2141,6 +2141,40 @@ function loadGame(containerId, gameUrl) {
                 allowfullscreen>
         </iframe>`;
 }
+       // --- UNIQUE VIEW TRACKING: 1 View per Item ID ---
+document.addEventListener('click', (e) => {
+    const card = e.target.closest('.card');
+    if (!card) return;
+
+    const onclick = card.getAttribute('onclick');
+    if (!onclick) return;
+
+    // List of your IDs
+    const ids = ['movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7', 'totc_show', 'castastics_show', 'idiotastics_show'];
+    const foundId = ids.find(id => onclick.includes(id));
+
+    if (foundId) {
+        // Create a unique key for this specific item
+        const storageKey = 'viewed_' + foundId;
+
+        // Check if this specific item has already been viewed by this user
+        if (!localStorage.getItem(storageKey)) {
+            
+            // 1. Increment the individual movie/episode count
+            runTransaction(ref(db, 'itemViews/' + foundId), (val) => (val || 0) + 1);
+            
+            // 2. Increment the global count (since it's a new unique view)
+            runTransaction(viewRef, (currentValue) => (currentValue || 1042583) + 1);
+            
+            // 3. Save the flag so it won't count again
+            localStorage.setItem(storageKey, 'true');
+            
+            console.log("New unique view counted for: " + foundId);
+        } else {
+            console.log("Repeated view for " + foundId + " - No count added.");
+        }
+    }
+});
 </script>
 
 </body>
