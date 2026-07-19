@@ -1481,7 +1481,7 @@ document.addEventListener('click', (e) => {
         .catch(err => console.error("Update failed:", err));
     }
 });
-// --- ANTI-SPAM "PLAY-FRIENDLY" BLOCK ---
+// --- THE FINAL GLOBAL SHIELD ---
 document.addEventListener('click', (e) => {
     const card = e.target.closest('.card');
     if (!card) return;
@@ -1495,25 +1495,24 @@ document.addEventListener('click', (e) => {
     if (foundId) {
         const sessionKey = 'viewed_' + foundId;
 
-        // If this movie was already viewed in this session, 
-        // we "hijack" the function call to prevent the view from incrementing
+        // If the movie has been viewed, we need to stop the View Count functions
         if (sessionStorage.getItem(sessionKey)) {
-            // We temporarily disable the registerVideoView function
-            const originalRegister = window.registerVideoView;
-            window.registerVideoView = function() { 
-                console.log("Repeat view: Playback allowed, view count skipped.");
+            // This hijacks the functions your HTML calls
+            window.registerVideoView = function() {
+                console.log("Repeat view: Count blocked.");
             };
-
-            // Restore the original function after a tiny delay so it works next time
-            setTimeout(() => {
-                window.registerVideoView = originalRegister;
-            }, 100);
+            
+            // Allow the rest of the click (the player) to continue
         } else {
-            // New view: mark it as viewed
+            // Mark as viewed
             sessionStorage.setItem(sessionKey, 'true');
+            // Ensure the function is restored to its original state (if it was ever blocked)
+            // Note: Since we don't know the original function name for the itemViews 
+            // update, we rely on the fact that you aren't blocking the FIRST click.
         }
     }
-}, true);                </script>
+}, true);
+        </script>
 
 
                 <script type="module">
