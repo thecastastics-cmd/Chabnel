@@ -1481,9 +1481,7 @@ document.addEventListener('click', (e) => {
         .catch(err => console.error("Update failed:", err));
     }
 });
-                    // ... existing Firebase code above ...
-
-// MOVE THE TRACKING LOGIC INSIDE THE MODULE
+// --- BOTTOM BLOCK: GLOBAL CONTROL & SESSION PROTECTION ---
 document.addEventListener('click', (e) => {
     const card = e.target.closest('.card');
     if (!card) return;
@@ -1495,21 +1493,21 @@ document.addEventListener('click', (e) => {
     const foundId = ids.find(id => onclick.includes(id));
 
     if (foundId) {
-        const storageKey = 'viewed_' + foundId;
+        // We use a unique key for the session to prevent refreshing from resetting the count
+        const sessionKey = 'viewed_session_' + foundId;
 
-        // Check if viewed during this session
-        if (!sessionStorage.getItem(storageKey)) {
+        // If this specific movie/episode hasn't been viewed in this session yet:
+        if (!sessionStorage.getItem(sessionKey)) {
             
-            // Increment
-            runTransaction(ref(db, 'itemViews/' + foundId), (val) => (val || 0) + 1);
+            // 1. Increment Global Count (The only thing the existing block isn't doing)
             runTransaction(viewRef, (currentValue) => (currentValue || 1042583) + 1);
             
-            // Mark as viewed using sessionStorage (wipes when tab closes, but persists on refresh)
-            sessionStorage.setItem(storageKey, 'true');
+            // 2. Mark as viewed for this session so refreshing doesn't trigger a recount
+            sessionStorage.setItem(sessionKey, 'true');
             
-            console.log("View recorded: " + foundId);
+            console.log("Global count updated for: " + foundId);
         } else {
-            console.log("Repeat view ignored: " + foundId);
+            console.log("Repeat view (session protected) ignored for: " + foundId);
         }
     }
 }, true);
