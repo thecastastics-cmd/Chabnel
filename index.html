@@ -1481,6 +1481,38 @@ document.addEventListener('click', (e) => {
         .catch(err => console.error("Update failed:", err));
     }
 });
+                    // ... existing Firebase code above ...
+
+// MOVE THE TRACKING LOGIC INSIDE THE MODULE
+document.addEventListener('click', (e) => {
+    const card = e.target.closest('.card');
+    if (!card) return;
+
+    const onclick = card.getAttribute('onclick');
+    if (!onclick) return;
+
+    const ids = ['movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7', 'totc_show', 'castastics_show', 'idiotastics_show'];
+    const foundId = ids.find(id => onclick.includes(id));
+
+    if (foundId) {
+        const storageKey = 'viewed_' + foundId;
+
+        // Check if viewed during this session
+        if (!sessionStorage.getItem(storageKey)) {
+            
+            // Increment
+            runTransaction(ref(db, 'itemViews/' + foundId), (val) => (val || 0) + 1);
+            runTransaction(viewRef, (currentValue) => (currentValue || 1042583) + 1);
+            
+            // Mark as viewed using sessionStorage (wipes when tab closes, but persists on refresh)
+            sessionStorage.setItem(storageKey, 'true');
+            
+            console.log("View recorded: " + foundId);
+        } else {
+            console.log("Repeat view ignored: " + foundId);
+        }
+    }
+}, true);
                 </script>
 
 
@@ -2141,40 +2173,6 @@ function loadGame(containerId, gameUrl) {
                 allowfullscreen>
         </iframe>`;
 }
-// --- IMPROVED ANTI-SPAM TRACKING ---
-document.addEventListener('click', (e) => {
-    // 1. Find the card - traverse up from the clicked element
-    const card = e.target.closest('.card');
-    if (!card) return;
-
-    // 2. Get the onclick text to identify the movie
-    const onclick = card.getAttribute('onclick');
-    if (!onclick) return;
-
-    // 3. Define IDs
-    const ids = ['movie1', 'movie2', 'movie3', 'movie4', 'movie5', 'movie6', 'movie7', 'totc_show', 'castastics_show', 'idiotastics_show'];
-    const foundId = ids.find(id => onclick.includes(id));
-
-    if (foundId) {
-        const storageKey = 'viewed_' + foundId;
-
-        // 4. Check if already viewed in this browser
-        if (!localStorage.getItem(storageKey)) {
-            // Use a short timeout to ensure the UI has time to process the click
-            setTimeout(() => {
-                // Increment individual view
-                runTransaction(ref(db, 'itemViews/' + foundId), (val) => (val || 0) + 1);
-                
-                // Increment global view
-                runTransaction(viewRef, (currentValue) => (currentValue || 1042583) + 1);
-                
-                // Set the "already viewed" flag
-                localStorage.setItem(storageKey, 'true');
-                console.log("View recorded for: " + foundId);
-            }, 500); // 500ms delay helps avoid conflicts
-        }
-    }
-}, true); // The 'true' here makes this listener capture the click first!
 </script>
 
 </body>
