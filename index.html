@@ -1481,7 +1481,7 @@ document.addEventListener('click', (e) => {
         .catch(err => console.error("Update failed:", err));
     }
 });
-// --- BOTTOM BLOCK: GLOBAL CONTROL & SESSION PROTECTION ---
+// --- ANTI-SPAM GATEKEEPER ---
 document.addEventListener('click', (e) => {
     const card = e.target.closest('.card');
     if (!card) return;
@@ -1493,24 +1493,22 @@ document.addEventListener('click', (e) => {
     const foundId = ids.find(id => onclick.includes(id));
 
     if (foundId) {
-        // We use a unique key for the session to prevent refreshing from resetting the count
-        const sessionKey = 'viewed_session_' + foundId;
+        // Create a unique key for THIS movie/show
+        const sessionKey = 'viewed_' + foundId;
 
-        // If this specific movie/episode hasn't been viewed in this session yet:
-        if (!sessionStorage.getItem(sessionKey)) {
-            
-            // 1. Increment Global Count (The only thing the existing block isn't doing)
-            runTransaction(viewRef, (currentValue) => (currentValue || 1042583) + 1);
-            
-            // 2. Mark as viewed for this session so refreshing doesn't trigger a recount
-            sessionStorage.setItem(sessionKey, 'true');
-            
-            console.log("Global count updated for: " + foundId);
+        // CHECK: Has this movie been viewed in this session?
+        if (sessionStorage.getItem(sessionKey)) {
+            // STOP: This prevents the double count.
+            // We prevent the event from doing anything else.
+            e.stopImmediatePropagation();
+            console.log("Repeat view blocked for:", foundId);
         } else {
-            console.log("Repeat view (session protected) ignored for: " + foundId);
+            // NEW VIEW: Mark it so it doesn't count again
+            sessionStorage.setItem(sessionKey, 'true');
+            console.log("New view recorded for:", foundId);
         }
     }
-}, true);
+}, true); // The 'true' is vital: it lets us intercept the click BEFORE the first block sees it.
                 </script>
 
 
