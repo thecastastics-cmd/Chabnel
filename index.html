@@ -2167,15 +2167,18 @@ document.addEventListener('DOMContentLoaded', function() {
 function loadGame(containerId, gameUrl) {
     const container = document.getElementById(containerId);
     
-    // We add overflow: hidden to the container and stretch the iframe down to crop out the banner
+    // Ensure the container can hold absolute positioned cover elements
+    container.style.position = "relative";
     container.style.overflow = "hidden";
     container.style.borderRadius = "12px";
     
     container.innerHTML = `
         <iframe src="${gameUrl}" 
-                style="width: 100%; height: calc(500px + 50px); border: none; margin-bottom: -50px;" 
+                style="width: 100%; height: 500px; border: none;" 
                 allowfullscreen>
-        </iframe>`;
+        </iframe>
+        <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 35px; background: #000; pointer-events: none;"></div>
+    `;
 }
 </script>
 
